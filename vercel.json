@@ -1,0 +1,11 @@
+# Vercel deployment configuration
+{
+  "version": 2,
+  "builds": [
+    { "src": "vite.config.ts", "use": "@vercel/node" },
+    { "src": "src/main.tsx", "use": "@vercel/static-build" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
