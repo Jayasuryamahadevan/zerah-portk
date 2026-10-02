@@ -13,8 +13,24 @@ function App() {
     const [loadRest, setLoadRest] = useState(false);
 
     useEffect(() => {
-        const timeoutId = window.setTimeout(() => setLoadRest(true), 120);
-        return () => window.clearTimeout(timeoutId);
+        let timeoutId: number | undefined;
+
+        const scheduleBelowFold = () => {
+            timeoutId = window.setTimeout(() => setLoadRest(true), 80);
+        };
+
+        if (document.readyState === 'complete') {
+            scheduleBelowFold();
+        } else {
+            window.addEventListener('load', scheduleBelowFold, { once: true });
+        }
+
+        return () => {
+            window.removeEventListener('load', scheduleBelowFold);
+            if (timeoutId !== undefined) {
+                window.clearTimeout(timeoutId);
+            }
+        };
     }, []);
 
     return (
