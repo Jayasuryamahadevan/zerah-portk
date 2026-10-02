@@ -1,5 +1,8 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function AgenticAI() {
     const sectionRef = useRef<HTMLElement>(null);
@@ -7,30 +10,36 @@ export default function AgenticAI() {
     const pRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        const desktopMotion = window.matchMedia('(min-width: 768px) and (prefers-reduced-motion: no-preference)').matches;
+        if (!desktopMotion) return;
+
         const ctx = gsap.context(() => {
             gsap.from(textRef.current, {
                 opacity: 0,
-                y: 50,
-                duration: 1.5,
+                y: 42,
+                duration: 0.95,
                 ease: 'power4.out',
                 scrollTrigger: {
                     trigger: sectionRef.current,
-                    start: 'top center+=20%',
+                    start: 'top 80%',
+                    once: true,
                 }
             });
 
             gsap.from(pRef.current?.children || [], {
                 opacity: 0,
-                y: 30,
-                duration: 1,
-                stagger: 0.2,
+                y: 24,
+                duration: 0.7,
+                stagger: 0.12,
                 ease: 'power3.out',
                 scrollTrigger: {
                     trigger: pRef.current,
-                    start: 'top bottom-=10%',
+                    start: 'top 86%',
+                    once: true,
                 }
             });
         }, sectionRef);
+
         return () => ctx.revert();
     }, []);
 
@@ -52,8 +61,7 @@ export default function AgenticAI() {
                 </div>
             </div>
 
-            {/* Abstract background element */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white opacity-[0.02] blur-3xl rounded-full pointer-events-none"></div>
+            <div className="decorative-blur absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white opacity-[0.02] rounded-full pointer-events-none"></div>
         </section>
     );
 }
