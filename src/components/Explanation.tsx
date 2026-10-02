@@ -1,5 +1,8 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Explanation() {
     const containerRef = useRef<HTMLElement>(null);
@@ -7,78 +10,76 @@ export default function Explanation() {
     const paragraphRefs = useRef<HTMLParagraphElement[]>([]);
 
     useEffect(() => {
-        let ctx = gsap.context(() => {
+        const desktopMotion = window.matchMedia('(min-width: 768px) and (prefers-reduced-motion: no-preference)').matches;
 
-            // Function to wrap words in spans for the Blur effect
+        if (!desktopMotion) {
+            return;
+        }
+
+        const ctx = gsap.context(() => {
             const splitTextToSpans = (element: HTMLElement | null) => {
-                if (!element) return;
+                if (!element) return null;
+
                 const text = element.innerText;
                 element.innerHTML = '';
-                const words = text.split(' ').filter(w => w.length > 0);
 
-                words.forEach((word) => {
+                text.split(' ').filter(Boolean).forEach((word) => {
                     const span = document.createElement('span');
                     span.innerText = word;
                     span.style.display = 'inline-block';
-                    // Initial state for the animation
                     span.style.opacity = '0';
-                    span.style.filter = 'blur(10px)';
+                    span.style.filter = 'blur(8px)';
                     span.style.transform = 'translateY(10px)';
-                    span.style.willChange = 'opacity, filter, transform';
                     element.appendChild(span);
-                    // Crucial: append an actual text node for the space so HTML doesn't collapse it
                     element.appendChild(document.createTextNode(' '));
                 });
+
                 return element.querySelectorAll('span');
             };
 
-            // Apply splitting
             const headingWords = splitTextToSpans(headingRef.current);
-            const paragraphWordsList = paragraphRefs.current.map(p => splitTextToSpans(p));
+            const paragraphWordsList = paragraphRefs.current.map((paragraph) => splitTextToSpans(paragraph));
 
-            // Animate Heading (Gradual Blur)
             if (headingWords) {
                 gsap.to(headingWords, {
                     opacity: 1,
                     filter: 'blur(0px)',
                     y: 0,
-                    duration: 1.2,
-                    stagger: 0.04,
-                    ease: "power2.out",
+                    duration: 0.9,
+                    stagger: 0.025,
+                    ease: 'power2.out',
                     scrollTrigger: {
                         trigger: headingRef.current,
-                        start: "top bottom-=15%",
-                        toggleActions: "play none none reverse"
-                    }
+                        start: 'top 85%',
+                        once: true,
+                    },
                 });
             }
 
-            // Animate Paragraphs (Gradual Blur)
             paragraphWordsList.forEach((wordNodes, index) => {
-                if (wordNodes) {
-                    gsap.to(wordNodes, {
-                        opacity: 1,
-                        filter: 'blur(0px)',
-                        y: 0,
-                        duration: 1,
-                        stagger: 0.02,
-                        delay: index * 0.2, // slight delay for second paragraph
-                        ease: "power2.out",
-                        scrollTrigger: {
-                            trigger: paragraphRefs.current[index],
-                            start: "top bottom-=10%",
-                            toggleActions: "play none none reverse"
-                        }
-                    });
-                }
-            });
+                if (!wordNodes) return;
 
+                gsap.to(wordNodes, {
+                    opacity: 1,
+                    filter: 'blur(0px)',
+                    y: 0,
+                    duration: 0.75,
+                    stagger: 0.012,
+                    delay: index * 0.08,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: paragraphRefs.current[index],
+                        start: 'top 88%',
+                        once: true,
+                    },
+                });
+            });
         }, containerRef);
 
         return () => ctx.revert();
     }, []);
 
-    const addToRefs = (el: HTMLParagraphElement) => {
+    const addToRefs = (el: HTMLParagraphElement | null) => {
         if (el && !paragraphRefs.current.includes(el)) {
             paragraphRefs.current.push(el);
         }
@@ -86,13 +87,11 @@ export default function Explanation() {
 
     return (
         <section id="explanation" ref={containerRef} className="relative min-h-[80vh] bg-neutral-950 text-white flex flex-col items-center justify-center p-8 md:p-24 overflow-hidden z-20">
-            {/* Extended Cinematic Dark Background to match Hero */}
             <div
-                className="absolute top-0 left-0 w-full h-[150%] pointer-events-none opacity-60 z-0 bg-cover bg-center bg-no-repeat bg-fixed"
+                className="cinematic-bg absolute top-0 left-0 w-full h-[150%] pointer-events-none opacity-60 z-0 bg-cover bg-center bg-no-repeat"
                 style={{ backgroundImage: 'url(/hero-bg.png)' }}
             />
 
-            {/* Dark Gradient Overlay to ensure text readability and seam blending */}
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black pointer-events-none z-0"></div>
 
             <div className="max-w-4xl relative z-10 w-full mt-12 mb-24">
