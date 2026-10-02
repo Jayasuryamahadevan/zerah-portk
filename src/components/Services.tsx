@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowUpRight, Cpu, Bot, Network } from 'lucide-react';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const services = [
     {
@@ -33,29 +36,33 @@ export default function Services() {
     const containerRef = useRef<HTMLElement>(null);
 
     useEffect(() => {
-        let ctx = gsap.context(() => {
-            gsap.from(".service-window", {
-                y: 50,
+        const desktopMotion = window.matchMedia('(min-width: 768px) and (prefers-reduced-motion: no-preference)').matches;
+        if (!desktopMotion) return;
+
+        const ctx = gsap.context(() => {
+            gsap.from('.service-window', {
+                y: 42,
                 opacity: 0,
-                scale: 0.98,
-                duration: 1.5,
-                ease: "expo.out",
+                scale: 0.985,
+                duration: 1.05,
+                ease: 'power3.out',
                 scrollTrigger: {
                     trigger: containerRef.current,
-                    start: "top center+=20%",
+                    start: 'top 82%',
+                    once: true,
                 }
             });
 
-            gsap.from(".service-block", {
+            gsap.from('.service-block', {
                 opacity: 0,
-                y: 30,
-                scale: 0.95,
-                stagger: 0.1,
-                duration: 1,
-                ease: "power2.out",
+                y: 24,
+                stagger: 0.07,
+                duration: 0.72,
+                ease: 'power2.out',
                 scrollTrigger: {
-                    trigger: ".service-window",
-                    start: "top center+=10%",
+                    trigger: '.service-window',
+                    start: 'top 80%',
+                    once: true,
                 }
             });
         }, containerRef);
@@ -65,20 +72,14 @@ export default function Services() {
 
     return (
         <section id="services" ref={containerRef} className="relative w-full min-h-screen overflow-hidden bg-neutral-950 flex flex-col items-center justify-center p-4 md:p-12 z-20">
-            {/* Same continuous background */}
             <div
-                className="absolute top-0 left-0 w-full h-[150%] pointer-events-none opacity-60 z-0 bg-cover bg-center bg-no-repeat bg-fixed"
+                className="cinematic-bg absolute top-0 left-0 w-full h-[150%] pointer-events-none opacity-60 z-0 bg-cover bg-center bg-no-repeat"
                 style={{ backgroundImage: 'url(/hero-bg.png)' }}
             />
-            {/* Dark gradient to ensure contrast */}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent pointer-events-none z-0"></div>
 
-            {/* Main Window Container */}
-            <div className="service-window relative w-full max-w-7xl border border-white/10 rounded-[2.5rem] bg-black/60 backdrop-blur-2xl shadow-2xl p-6 md:p-10 z-10 flex flex-col xl:flex-row gap-6">
-
-                {/* Left Side: Header and Featured Service */}
+            <div className="service-window glass-panel relative w-full max-w-7xl border border-white/10 rounded-[2.5rem] bg-black/60 shadow-2xl p-6 md:p-10 z-10 flex flex-col xl:flex-row gap-6">
                 <div className="flex flex-col gap-6 w-full xl:w-2/5">
-                    {/* Header Block */}
                     <div className="bg-neutral-900/50 rounded-[2rem] p-8 md:p-12 border border-white/5 h-full flex flex-col justify-between">
                         <div>
                             <div className="text-white/50 text-xs font-bold tracking-[0.2em] uppercase mb-4">Core Principles</div>
@@ -91,7 +92,6 @@ export default function Services() {
                         </p>
                     </div>
 
-                    {/* Featured Service Block - White Block */}
                     <div className={`service-block group ${services[0].color} ${services[0].textColor} rounded-[2rem] p-8 relative overflow-hidden cursor-pointer`}>
                         <div className="flex justify-between items-start mb-16">
                             {(() => {
@@ -110,7 +110,6 @@ export default function Services() {
                     </div>
                 </div>
 
-                {/* Right Side: Grid of remaining services */}
                 <div className="w-full xl:w-3/5 grid grid-cols-1 md:grid-cols-2 gap-6">
                     {services.slice(1).map((srv) => {
                         const SrvIcon = srv.icon;
@@ -133,16 +132,13 @@ export default function Services() {
                                     </p>
                                 </div>
 
-                                {/* Hover reveal glow */}
                                 <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-[0.03] transition-opacity duration-300 pointer-events-none"></div>
                             </div>
                         );
                     })}
 
-                    {/* Final Action/Image Block */}
                     <div className="service-block md:col-span-2 group bg-neutral-900 border border-white/5 rounded-[2rem] p-8 flex flex-col sm:flex-row items-center justify-between cursor-pointer hover:bg-neutral-800 transition-colors duration-500 overflow-hidden relative">
-                        {/* Abstract background element simulating the 'headphone' image slot from reference */}
-                        <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors duration-700"></div>
+                        <div className="decorative-blur absolute -right-20 -bottom-20 w-64 h-64 bg-white/5 rounded-full group-hover:bg-white/10 transition-colors duration-700"></div>
 
                         <div className="flex flex-col gap-2 relative z-10">
                             <h3 className="text-white font-medium text-2xl tracking-tight">Enterprise Scale</h3>
@@ -153,7 +149,6 @@ export default function Services() {
                         </div>
                     </div>
                 </div>
-
             </div>
         </section>
     );
