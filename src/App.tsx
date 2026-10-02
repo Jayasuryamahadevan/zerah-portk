@@ -1,47 +1,36 @@
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Lenis from 'lenis';
+import { lazy, Suspense, useEffect, useState } from 'react';
 
 import Hero from './components/Hero';
-import Explanation from './components/Explanation';
-import Services from './components/Services';
-import Products from './components/Products';
-import AgenticAI from './components/AgenticAI';
-import Research from './components/Research';
-import Footer from './components/Footer';
 
-gsap.registerPlugin(ScrollTrigger);
+const Explanation = lazy(() => import('./components/Explanation'));
+const Services = lazy(() => import('./components/Services'));
+const Products = lazy(() => import('./components/Products'));
+const AgenticAI = lazy(() => import('./components/AgenticAI'));
+const Research = lazy(() => import('./components/Research'));
+const Footer = lazy(() => import('./components/Footer'));
 
 function App() {
-    const lenisRef = useRef<Lenis | null>(null);
+    const [loadRest, setLoadRest] = useState(false);
 
     useEffect(() => {
-        // Initialize Lenis for smooth scrolling
-        const lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            orientation: 'vertical',
-            gestureOrientation: 'vertical',
-            smoothWheel: true,
-            wheelMultiplier: 1,
-            touchMultiplier: 2,
-        });
-        lenisRef.current = lenis;
+        let timeoutId: number | undefined;
+        let idleId: number | undefined;
 
-        lenis.on('scroll', ScrollTrigger.update);
+        const reveal = () => setLoadRest(true);
 
-        const updateLenis = (time: number) => {
-            lenis.raf(time * 1000);
-        };
-
-        gsap.ticker.add(updateLenis);
-
-        gsap.ticker.lagSmoothing(0);
+        if ('requestIdleCallback' in window) {
+            idleId = window.requestIdleCallback(reveal, { timeout: 700 });
+        } else {
+            timeoutId = window.setTimeout(reveal, 120);
+        }
 
         return () => {
-            lenis.destroy();
-            gsap.ticker.remove(updateLenis);
+            if (idleId !== undefined && 'cancelIdleCallback' in window) {
+                window.cancelIdleCallback(idleId);
+            }
+            if (timeoutId !== undefined) {
+                window.clearTimeout(timeoutId);
+            }
         };
     }, []);
 
@@ -49,14 +38,19 @@ function App() {
         <div className="min-h-screen bg-white text-black font-sans">
             <main>
                 <Hero />
-                <Explanation />
-                <Services />
-                <Products />
-                <AgenticAI />
-                <Research />
+                {loadRest ? (
+                    <Suspense fallback={<div className="min-h-[80vh] bg-neutral-950" aria-hidden="true" />}>
+                        <Explanation />
+                        <Services />
+                        <Products />
+                        <AgenticAI />
+                        <Research />
+                        <Footer />
+                    </Suspense>
+                ) : (
+                    <div className="min-h-[80vh] bg-neutral-950" aria-hidden="true" />
+                )}
             </main>
-
-            <Footer />
         </div>
     );
 }
