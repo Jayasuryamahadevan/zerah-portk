@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowUpRight } from 'lucide-react';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const researchTracks = [
     {
@@ -31,18 +34,21 @@ export default function Research() {
     const listRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        let ctx = gsap.context(() => {
+        const desktopMotion = window.matchMedia('(min-width: 768px) and (prefers-reduced-motion: no-preference)').matches;
+        if (!desktopMotion) return;
+
+        const ctx = gsap.context(() => {
             gsap.fromTo(
                 '.research-headline',
-                { opacity: 0, y: 40 },
+                { opacity: 0, y: 32 },
                 {
                     opacity: 1,
                     y: 0,
-                    duration: 1,
+                    duration: 0.8,
                     ease: 'power3.out',
                     scrollTrigger: {
                         trigger: sectionRef.current,
-                        start: 'top 78%',
+                        start: 'top 80%',
                         once: true,
                     },
                 }
@@ -50,44 +56,44 @@ export default function Research() {
 
             gsap.fromTo(
                 imageRef.current,
-                { opacity: 0, scale: 0.92, y: 60 },
+                { opacity: 0, scale: 0.96, y: 36 },
                 {
                     opacity: 1,
                     scale: 1,
                     y: 0,
-                    duration: 1.1,
+                    duration: 0.9,
                     ease: 'power3.out',
                     scrollTrigger: {
                         trigger: imageRef.current,
-                        start: 'top 82%',
+                        start: 'top 84%',
                         once: true,
                     },
                 }
             );
 
             gsap.to(imageRef.current, {
-                y: -26,
+                y: -18,
                 ease: 'none',
                 scrollTrigger: {
                     trigger: sectionRef.current,
                     start: 'top bottom',
                     end: 'bottom top',
-                    scrub: true,
+                    scrub: 0.6,
                 },
             });
 
             gsap.fromTo(
                 '.research-row',
-                { opacity: 0, y: 38 },
+                { opacity: 0, y: 28 },
                 {
                     opacity: 1,
                     y: 0,
-                    duration: 0.8,
-                    stagger: 0.12,
+                    duration: 0.65,
+                    stagger: 0.08,
                     ease: 'power3.out',
                     scrollTrigger: {
                         trigger: listRef.current,
-                        start: 'top 80%',
+                        start: 'top 82%',
                         once: true,
                     },
                 }
@@ -112,10 +118,11 @@ export default function Research() {
 
                     <div ref={imageRef} className="mt-10 relative overflow-hidden rounded-[2rem] border border-white/10 bg-neutral-900/60">
                         <img
-                            src="https://images.unsplash.com/photo-1581092787765-e3feb951d987?auto=format&fit=crop&w=1400&q=80"
+                            src="https://images.unsplash.com/photo-1581092787765-e3feb951d987?auto=format&fit=crop&w=1200&q=72"
                             alt="AI research laboratory with advanced monitoring displays"
                             className="w-full h-[330px] md:h-[420px] object-cover"
                             loading="lazy"
+                            decoding="async"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
                         <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between">
