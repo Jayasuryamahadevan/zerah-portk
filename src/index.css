@@ -207,3 +207,14 @@ nav a:hover::after {
     scroll-behavior: auto !important;
   }
 }
+
+
+#explanation,
+#services,
+#products,
+#agentic,
+#research,
+#contact {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}
