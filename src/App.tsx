@@ -13,25 +13,8 @@ function App() {
     const [loadRest, setLoadRest] = useState(false);
 
     useEffect(() => {
-        let timeoutId: number | undefined;
-        let idleId: number | undefined;
-
-        const reveal = () => setLoadRest(true);
-
-        if ('requestIdleCallback' in window) {
-            idleId = window.requestIdleCallback(reveal, { timeout: 700 });
-        } else {
-            timeoutId = window.setTimeout(reveal, 120);
-        }
-
-        return () => {
-            if (idleId !== undefined && 'cancelIdleCallback' in window) {
-                window.cancelIdleCallback(idleId);
-            }
-            if (timeoutId !== undefined) {
-                window.clearTimeout(timeoutId);
-            }
-        };
+        const timeoutId = window.setTimeout(() => setLoadRest(true), 120);
+        return () => window.clearTimeout(timeoutId);
     }, []);
 
     return (
