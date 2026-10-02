@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowUpRight, Cpu, Search, Layers, Database, BookOpen } from 'lucide-react';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const products = [
     {
@@ -60,51 +63,44 @@ export default function Products() {
     const windowRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        let ctx = gsap.context(() => {
-            // Main Window Entrance
+        const desktopMotion = window.matchMedia('(min-width: 768px) and (prefers-reduced-motion: no-preference)').matches;
+        if (!desktopMotion) return;
+
+        const ctx = gsap.context(() => {
             gsap.from(windowRef.current, {
-                y: 100,
+                y: 56,
                 opacity: 0,
-                scale: 0.95,
-                rotationX: 5,
-                transformPerspective: 1000,
-                duration: 1.5,
-                ease: "expo.out",
+                scale: 0.98,
+                duration: 1.05,
+                ease: 'power3.out',
                 scrollTrigger: {
                     trigger: containerRef.current,
-                    start: "top bottom-=10%",
+                    start: 'top 82%',
+                    once: true,
                 }
             });
 
-            // Grid Items Advanced Stagger Reveal
             gsap.fromTo(
-                ".product-block",
+                '.product-block',
                 {
                     opacity: 0,
-                    y: 50,
-                    scale: 0.9,
-                    rotationY: 5,
-                    transformPerspective: 1000
+                    y: 32,
+                    scale: 0.965,
                 },
                 {
                     opacity: 1,
                     y: 0,
                     scale: 1,
-                    rotationY: 0,
-                    stagger: {
-                        each: 0.1,
-                        from: "start"
-                    },
-                    duration: 1.1,
-                    ease: "power3.out",
+                    stagger: 0.07,
+                    duration: 0.78,
+                    ease: 'power3.out',
                     scrollTrigger: {
                         trigger: windowRef.current,
-                        start: "top 85%",
+                        start: 'top 85%',
                         once: true,
                     }
                 }
             );
-
         }, containerRef);
 
         return () => ctx.revert();
@@ -112,9 +108,8 @@ export default function Products() {
 
     return (
         <section id="products" ref={containerRef} className="relative w-full min-h-screen overflow-hidden bg-neutral-950 flex flex-col items-center justify-center p-4 md:p-12 z-20">
-            {/* Same continuous cinematic background */}
             <div
-                className="absolute top-0 left-0 w-full h-[150%] pointer-events-none opacity-60 z-0 bg-cover bg-center bg-no-repeat bg-fixed"
+                className="cinematic-bg absolute top-0 left-0 w-full h-[150%] pointer-events-none opacity-60 z-0 bg-cover bg-center bg-no-repeat"
                 style={{ backgroundImage: 'url(/hero-bg.png)' }}
             />
 
@@ -132,12 +127,8 @@ export default function Products() {
                 </div>
             </div>
 
-            {/* Main Window Container - High End "App" / "Gaming" UI */}
-            <div ref={windowRef} className="relative w-full max-w-7xl border border-white/10 rounded-[2.5rem] bg-neutral-900/30 backdrop-blur-3xl shadow-2xl p-4 md:p-8 z-10 flex flex-col xl:flex-row gap-4">
-
-                {/* Asymmetrical Grid System */}
+            <div ref={windowRef} className="glass-panel relative w-full max-w-7xl border border-white/10 rounded-[2.5rem] bg-neutral-900/40 shadow-2xl p-4 md:p-8 z-10 flex flex-col xl:flex-row gap-4">
                 <div className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 auto-rows-min">
-
                     {products.map((prod, index) => {
                         const ProdIcon = prod.icon;
                         const isFeatured = index === 0;
@@ -165,17 +156,14 @@ export default function Products() {
                                     </p>
                                 </div>
 
-                                {/* Abstract glowing background element for visual interest */}
                                 {!isFeatured && (
-                                    <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors duration-700 pointer-events-none"></div>
+                                    <div className="decorative-blur absolute -bottom-10 -right-10 w-48 h-48 bg-white/5 rounded-full group-hover:bg-white/10 transition-colors duration-700 pointer-events-none"></div>
                                 )}
 
-                                {/* Hover overlay */}
                                 <div className={`absolute inset-0 ${isFeatured ? 'bg-black opacity-0 group-hover:opacity-[0.02]' : 'bg-white opacity-0 group-hover:opacity-[0.03]'} transition-opacity duration-300 pointer-events-none`}></div>
                             </div>
                         );
                     })}
-
                 </div>
             </div>
         </section>
